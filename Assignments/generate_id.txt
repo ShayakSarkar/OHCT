@@ -1,0 +1,16 @@
+Write the following function in python3
+
+	int generate_id()
+	
+	specifications: 
+		each time generate id is called it should return 1 more than what it had returned on its last call
+		ex: 
+			generate_id() --> 1
+			generate_id() --> 2
+			generate_id() --> 3
+			
+			
+		you can make use of a file to store the last id that was generated so 
+		make use of the contents of that file to generate the new id
+		first return value of the function should be 1
+		

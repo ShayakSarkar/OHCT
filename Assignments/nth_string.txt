@@ -1,0 +1,21 @@
+Write the following function in C++
+
+    std::string nth_string(std::vector<char> symbols,int n)
+
+    specifications:
+        given a vector of symbols, the function should return the nth string
+        that can be formed from those symbols
+
+        ex:
+            symbols=[@,a,c,#,&,v]
+            1st string = @
+            2nd string = a
+            6th string = v
+            7th string = @@
+            10th string = @#
+            13th string = a@
+        
+        the function should perform better than O(n)
+
+
+192021220098806708

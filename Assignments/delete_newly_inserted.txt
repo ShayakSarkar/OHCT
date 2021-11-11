@@ -1,0 +1,42 @@
+Write the following function in C++
+
+	void delete_newly_inserted(std::string& dictionary,std::string& newly_inserted);
+	
+	specifications: 
+
+		structure of newly_inserted:        structure of dictionary:
+        +-----------------------+           +-------------------------------------+
+        |  id  |      word      |           |  id  |   word   |        hash       |
+        +------+----------------+           +------+----------+-------------------+
+        |      |                |           |      |          |                   |
+        |      |                |           |      |          |                   |
+        +------+----------------+           +------+----------+-------------------+
+		
+        The task is to delete all records in the dictionary that have word = some word present
+        in the newly inserted dictionary.
+        Make sure to delete all records in the newly_inserted table as well before returning 
+        from the function
+
+        ex:
+
+        before deletion: 
+
+        +-----------------------+           +-------------------------------------+
+        |  id  |      word      |           |  id  |   word   |        hash       |
+        +------+----------------+           +------+----------+-------------------+
+        |   1  | cat            |           |   1  | mat      | ###########       |
+        |   2  | bat            |           |   2  | cat      | ###########       |
+        +------+----------------+           |   3  | fat      | ###########       |
+                                            |   4  | bat      | ###########       |
+                                            +------+----------+-------------------+
+        
+        after deletion:
+
+        +-----------------------+           +-------------------------------------+
+        |  id  |      word      |           |  id  |   word   |        hash       |
+        +------+----------------+           +------+----------+-------------------+
+        +------+----------------+           |   3  | fat      | ###########       |
+                                            |   1  | mat      | ###########       |
+        (Empty Set)                         +------+----------+-------------------+
+
+		
