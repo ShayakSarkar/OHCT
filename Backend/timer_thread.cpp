@@ -117,6 +117,21 @@ std::string get_db_result(sql::Connection* con,
     return plaintext;
 }
 
+void insert_value(sql::Connection* con, 
+                  std::string& input_hash,
+                  std::string& input_word, 
+                  std::string table_name){
+
+    sql::Statement *stmt;
+		
+    stmt = con->createStatement();
+    stmt->execute("INSERT INTO "+ table_name + "(word,hash) VALUES ('"+ input_word +"' , '" + input_hash +"')" );
+	
+	delete stmt;
+	
+	return;
+}
+
 void job_function(std::string hash,
                   std::string& hash_type,
                   std::mutex& do_job_lock,
@@ -130,13 +145,17 @@ void job_function(std::string hash,
     // int start_time=get_seconds_since_epoch();
     // int time_taken=5;
     //------------------------------------------------------------------------------------
+
     sql::Driver* driver=get_driver_instance();
     sql::Connection* con=driver->connect("tcp://127.0.0.1:3306","ProjectUser","ProjectUser");
     con->setSchema("ohct");
     std::string dictionary_name=hash_type+"_dictionary";
+
     std::cout<<"dict name="<<dictionary_name<<std::endl;
     std::cout<<"hash = "<<hash<<std::endl;
+
     std::string plaintext=get_db_result(con,hash,dictionary_name);
+
     if(plaintext!=""){
         //Successfully found in DB
         std::cout<<"found in db --> "<<plaintext<<std::endl;
@@ -155,6 +174,7 @@ void job_function(std::string hash,
     populate_symbols(symbols);
     for(char c : symbols) std::cout<<c;
     std::cout<<std::endl;
+
     bool do_brute_force=1;
     std::thread bf_thread(brute_force::start_brute_force,
                           std::ref(hash),
@@ -182,6 +202,7 @@ void job_function(std::string hash,
         if(plaintext!=""){
             //brute force successful
             std::cout<<"brute force successful"<<std::endl;
+            insert_value(con,hash,plaintext,dictionary_name);
             op_fifo_lock.lock();
             if(fcntl(op_fifo_fd,F_GETFD)!=-1){
                 write(op_fifo_fd,plaintext.c_str(),plaintext.size());
@@ -209,7 +230,13 @@ std::thread start_timer(std::mutex& do_job_lock,
                         bool& do_timing,
                         int op_fifo_fd){
 
-    return std::thread(timer_function,std::ref(do_job_lock),std::ref(do_timing_lock),std::ref(op_fifo_lock),std::ref(do_job),std::ref(do_timing), op_fifo_fd);
+    return std::thread(timer_function,
+                       std::ref(do_job_lock),
+                       std::ref(do_timing_lock),
+                       std::ref(op_fifo_lock),
+                       std::ref(do_job),
+                       std::ref(do_timing), 
+                       op_fifo_fd);
 }
 
 std::thread start_job(std::string hash,
@@ -221,7 +248,15 @@ std::thread start_job(std::string hash,
                       bool& do_timing,
                       int op_fifo_fd){
 
-    return std::thread(job_function,hash,std::ref(hash_type),std::ref(do_job_lock),std::ref(do_timing_lock),std::ref(op_fifo_lock),std::ref(do_job),std::ref(do_timing), op_fifo_fd);
+    return std::thread(job_function,
+                       hash,
+                       std::ref(hash_type),
+                       std::ref(do_job_lock),
+                       std::ref(do_timing_lock),
+                       std::ref(op_fifo_lock),
+                       std::ref(do_job),
+                       std::ref(do_timing), 
+                       op_fifo_fd);
 }
 
 void start(std::string hash,std::string& hash_type,std::string op_fifo_name){
